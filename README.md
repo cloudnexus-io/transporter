@@ -15,6 +15,8 @@ The project implements a standard Kubernetes operator pattern to orchestrate the
 
 ## Architecture
 
+![Architecture](./architecture.svg)
+
 Transporter consists of three main components:
 
 1.  **Transporter CLI (`transporter`):** A command-line interface for users to initiate and manage pod migrations.

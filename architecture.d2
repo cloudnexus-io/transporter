@@ -1,0 +1,71 @@
+direction: right
+
+User: User {
+  shape: person
+}
+
+K8s: Kubernetes API Server {
+  shape: cylinder
+}
+
+User -> K8s: 1. Create PodMigration CRD
+
+subgraph Control Plane {
+  Controller: PodMigration Controller {
+    shape: square
+    description: "Orchestrates migration phases"
+  }
+}
+
+Controller -> K8s: Watch / Update Status
+
+subgraph Source Node {
+  SourceAgent: Migration Agent {
+    description: "Source gRPC Server"
+  }
+  
+  SourcePod: Running Pod {
+    Process: Application Process {
+      shape: circle
+      description: "Source State"
+    }
+    Filesystem: OverlayFS UpperDir {
+      shape: parallelogram
+      description: "Local Changes"
+    }
+  }
+
+  SourceAgent -> SourcePod.Process: 3a. CRIU Dump (Memory/State)
+  SourceAgent -> SourcePod.Filesystem: 3b. Tar Filesystem Layer
+}
+
+subgraph Target Node {
+  TargetAgent: Migration Agent {
+    description: "Target gRPC Server"
+  }
+  
+  GhostPod: Ghost/Final Pod {
+    RestoredProcess: Application Process {
+      shape: circle
+      description: "Restored State"
+    }
+    TargetFS: Container Rootfs {
+      shape: parallelogram
+    }
+  }
+
+  TargetAgent -> GhostPod.TargetFS: 5a. Inject File Layer (Tar Extract)
+  TargetAgent -> GhostPod.RestoredProcess: 5b. CRIU Restore (Memory/State)
+}
+
+Controller -> TargetAgent: 2. Prepare (Setup Store)
+Controller -> SourceAgent: 3. StartMigration (Capture & Stream)
+SourceAgent -> TargetAgent: 4. Stream Checkpoint & Layer (gRPC)
+Controller -> TargetAgent: 5. ApplyLayer (Inject & Restore)
+
+# Highlighting specific migration types
+legend: Migration Layers {
+  Memory: "CRIU Images (.img files)"
+  Process: "Namespace Injection (nsenter)"
+  FileLayer: "OverlayFS UpperDir Tar"
+}
