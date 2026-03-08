@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "transporter/pkg/agent/api";
+
+service Migration {
+  rpc Prepare(PrepareRequest) returns (PrepareResponse) {}
+  rpc StartMigration(StartMigrationRequest) returns (StartMigrationResponse) {}
+  rpc ApplyLayer(ApplyLayerRequest) returns (ApplyLayerResponse) {}
+
+  rpc TransferMemory(stream MemoryChunk) returns (TransferResponse) {}
+  rpc TransferFilesystem(stream FileChunk) returns (TransferResponse) {}
+}
+
+message PrepareRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+}
+
+message PrepareResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StartMigrationRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+  string target_address = 3;
+  string container_id = 4; // Exact container to migrate
+}
+
+message StartMigrationResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ApplyLayerRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+  string container_id = 3; // For tracking newly created ghost pods
+}
+
+message ApplyLayerResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MemoryChunk {
+  bytes data = 1;
+  int64 offset = 2;
+}
+
+message FileChunk {
+  string path = 1;
+  bytes data = 2;
+}
+
+message TransferResponse {
+  bool success = 1;
+  string message = 2;
+}

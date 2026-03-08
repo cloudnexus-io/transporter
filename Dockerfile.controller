@@ -1,0 +1,28 @@
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /app
+
+# Copy the Go module files and download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the source code
+COPY api ./api
+COPY pkg ./pkg
+COPY controller ./controller
+
+# Build the controller
+WORKDIR /app/controller
+RUN CGO_ENABLED=0 GOOS=linux go build -o /controller .
+
+# Final image
+FROM alpine:latest
+
+# Add ca-certificates
+RUN apk --no-cache add ca-certificates
+
+# Copy the controller binary
+COPY --from=builder /controller /controller
+
+# Run the controller
+ENTRYPOINT ["/controller"]
