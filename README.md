@@ -87,7 +87,3 @@ helm install transporter ./helm-chart
 - `migration-agent/`: Node-level agent logic.
 - `helm-chart/`: Kubernetes deployment manifests.
 - `pkg/agent/api/`: gRPC service definitions for agent communication.
-
-## License
-
-[Add License Information Here]
