@@ -15,7 +15,7 @@ The project implements a standard Kubernetes operator pattern to orchestrate the
 
 ## Architecture
 
-![Architecture](./architecture.svg)
+![Architecture](./architecture.png)
 
 Transporter consists of three main components:
 
