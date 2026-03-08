@@ -1,26 +1,34 @@
 direction: right
+layout: elk
+
 vars: {
-  theme: 200
+  theme: 200 # Graphite / Dark
 }
 
+# Global Sleek Styling
 *.style: {
-  stroke-width: 8
-  stroke: "#FFFFFF"
-  font-color: "#FFFFFF"
+  stroke-width: 2
+  stroke: "#E2E8F0" # Soft White/Blue
+  font-color: "#F8FAFC"
+  border-radius: 12 # Smooth rounded corners
 }
 
-grid: {
-  style: {
-    fill: "#000000"
-  }
+# Container styling for depth
+subgraph.style: {
+  stroke: "#475569"
+  fill: "#1E293B" # Dark Slate background for sections
+  stroke-dash: 4
+  font-size: 18
 }
 
 User: User {
   shape: person
+  style: { stroke: "#38BDF8"; stroke-width: 2 } # Cyan accent
 }
 
 K8s: Kubernetes API Server {
   shape: cylinder
+  style: { fill: "#334155" }
 }
 
 User -> K8s: 1. Create PodMigration CRD
@@ -29,6 +37,7 @@ subgraph Control Plane {
   Controller: PodMigration Controller {
     shape: square
     description: "Orchestrates migration phases"
+    style: { fill: "#0EA5E9"; stroke: "#7DD3FC" } # Blue accent
   }
 }
 
@@ -37,8 +46,9 @@ Controller -> K8s: Watch / Update Status
 subgraph Source Node {
   SourceAgent: Migration Agent {
     description: "Source gRPC Server"
+    style: { fill: "#6366F1" } # Indigo accent
   }
-  
+
   SourcePod: Running Pod {
     Process: Application Process {
       shape: circle
@@ -50,15 +60,16 @@ subgraph Source Node {
     }
   }
 
-  SourceAgent -> SourcePod.Process: 3a. CRIU Dump (Memory/State)
-  SourceAgent -> SourcePod.Filesystem: 3b. Tar Filesystem Layer
+  SourceAgent -> SourcePod.Process: 3a. CRIU Dump
+  SourceAgent -> SourcePod.Filesystem: 3b. Tar Layer
 }
 
 subgraph Target Node {
   TargetAgent: Migration Agent {
     description: "Target gRPC Server"
+    style: { fill: "#6366F1" }
   }
-  
+
   GhostPod: Ghost/Final Pod {
     RestoredProcess: Application Process {
       shape: circle
@@ -69,17 +80,32 @@ subgraph Target Node {
     }
   }
 
-  TargetAgent -> GhostPod.TargetFS: 5a. Inject File Layer (Tar Extract)
-  TargetAgent -> GhostPod.RestoredProcess: 5b. CRIU Restore (Memory/State)
+  TargetAgent -> GhostPod.TargetFS: 5a. Inject Layer
+  TargetAgent -> GhostPod.RestoredProcess: 5b. CRIU Restore
 }
 
-Controller -> TargetAgent: 2. Prepare (Setup Store)
-Controller -> SourceAgent: 3. StartMigration (Capture & Stream)
-SourceAgent -> TargetAgent: 4. Stream Checkpoint & Layer (gRPC)
-Controller -> TargetAgent: 5. ApplyLayer (Inject & Restore)
+# Logic Flow Connections
+Controller -> TargetAgent: 2. Prepare
+Controller -> SourceAgent: 3. StartMigration
+
+# The Hero Migration Path
+SourceAgent -> TargetAgent: 4. Stream Checkpoint & Layer (gRPC) {
+  style: {
+    stroke: "#38BDF8"
+    stroke-width: 4
+    animated: true
+  }
+}
+
+Controller -> TargetAgent: 5. ApplyLayer
 
 # Highlighting specific migration types
 legend: Migration Layers {
+  shape: package
+  style: {
+    fill: "#0F172A"
+    stroke: "#10B981" # Green accent
+  }
   Memory: "CRIU Images (.img files)"
   Process: "Namespace Injection (nsenter)"
   FileLayer: "OverlayFS UpperDir Tar"
