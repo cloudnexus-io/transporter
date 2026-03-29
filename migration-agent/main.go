@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -300,6 +301,27 @@ func (s *agentServer) ApplyLayer(ctx context.Context, in *pb.ApplyLayerRequest) 
 		}
 	}
 	return &pb.ApplyLayerResponse{Success: true, Message: "Applied"}, nil
+}
+
+func (s *agentServer) SignalHandover(ctx context.Context, in *pb.SignalHandoverRequest) (*pb.SignalHandoverResponse, error) {
+	fmt.Printf("SIGNAL HANDOVER: %s\n", in.PodName)
+
+	httpClient := &http.Client{Timeout: 5 * time.Second}
+
+	sidecarPodName := in.PodName + "-ghost"
+	resp, err := httpClient.Get(fmt.Sprintf("http://%s:50053/handover", sidecarPodName))
+	if err != nil {
+		fmt.Printf("Handover signal failed: %v\n", err)
+		return &pb.SignalHandoverResponse{Success: false, Message: err.Error()}, nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		fmt.Println("Handover successful")
+		return &pb.SignalHandoverResponse{Success: true, Message: "Handover completed"}, nil
+	}
+
+	return &pb.SignalHandoverResponse{Success: false, Message: "Handover failed"}, nil
 }
 
 func main() {

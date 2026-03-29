@@ -17,6 +17,7 @@ import (
 
 	migrationv1alpha1 "transporter/api/v1alpha1"
 	pb "transporter/pkg/agent/api"
+	"transporter/pkg/sidecar"
 )
 
 type PodMigrationReconciler struct {
@@ -64,6 +65,12 @@ func (r *PodMigrationReconciler) callAgentApply(ctx context.Context, nodeIP stri
 	if err != nil || !resp.Success {
 		return fmt.Errorf("failed")
 	}
+
+	handoverResp, err := client.SignalHandover(ctx, &pb.SignalHandoverRequest{PodName: podName, PodNamespace: podNamespace})
+	if err != nil || !handoverResp.Success {
+		return fmt.Errorf("handover signal failed")
+	}
+
 	return nil
 }
 
@@ -96,14 +103,58 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		ghost := &corev1.Pod{}
 		err := r.Get(ctx, types.NamespacedName{Name: ghostName, Namespace: mig.Spec.Namespace}, ghost)
 		if errors.IsNotFound(err) {
-			ghost = &corev1.Pod{
-				ObjectMeta: metav1.ObjectMeta{Name: ghostName, Namespace: mig.Spec.Namespace},
-				Spec: corev1.PodSpec{
-					NodeName:   mig.Spec.TargetNode,
-					Containers: []corev1.Container{{Name: "ubuntu", Image: "ubuntu", Command: []string{"sleep", "infinity"}}},
-				},
+			targetNode := &corev1.Node{}
+			r.Get(ctx, types.NamespacedName{Name: mig.Spec.TargetNode}, targetNode)
+			targetIP, _ := getNodeInternalIP(targetNode)
+
+			sourcePod := &corev1.Pod{}
+			r.Get(ctx, types.NamespacedName{Name: mig.Spec.PodName, Namespace: mig.Spec.Namespace}, sourcePod)
+			originalIP := sourcePod.Status.PodIP
+
+			appPort := 80
+			for _, c := range sourcePod.Spec.Containers {
+				for _, p := range c.Ports {
+					if p.ContainerPort > 0 {
+						appPort = int(p.ContainerPort)
+						break
+					}
+				}
 			}
-			r.Create(ctx, ghost)
+
+			srcContainer := sourcePod.Spec.Containers[0]
+			appContainer := corev1.Container{
+				Name:    "app",
+				Image:   srcContainer.Image,
+				Command: srcContainer.Command,
+				Args:    srcContainer.Args,
+				Env:     srcContainer.Env,
+				Ports:   srcContainer.Ports,
+			}
+
+			podSpec := &corev1.PodSpec{
+				NodeName:              mig.Spec.TargetNode,
+				ShareProcessNamespace: func() *bool { b := true; return &b }(),
+				Containers:            []corev1.Container{appContainer},
+				Volumes:               sourcePod.Spec.Volumes,
+			}
+			for i := range podSpec.Containers {
+				podSpec.Containers[i].VolumeMounts = nil
+			}
+			sidecar.InjectSidecar(podSpec, targetIP, appPort)
+
+			ghost = &corev1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:        ghostName,
+					Namespace:   mig.Spec.Namespace,
+					Annotations: map[string]string{"ipam.alpha.kubernetes.io/ips": originalIP},
+				},
+				Spec: *podSpec,
+			}
+			if err := r.Create(ctx, ghost); err != nil {
+				l.Error(err, "Failed to create ghost pod", "ghost", ghostName)
+				return ctrl.Result{}, err
+			}
+			l.Info("Created ghost pod", "ghost", ghostName, "originalIP", originalIP, "spec", podSpec)
 			return ctrl.Result{RequeueAfter: 2 * time.Second}, nil
 		}
 		if ghost.Status.Phase != corev1.PodRunning || len(ghost.Status.ContainerStatuses) == 0 || ghost.Status.ContainerStatuses[0].ContainerID == "" {
@@ -135,64 +186,45 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{Requeue: true}, nil
 
 	case migrationv1alpha1.PodMigrationPhaseFinalizing:
-		// Check if they exist first
+		ghostName := mig.Spec.PodName + "-ghost"
 		source := &corev1.Pod{}
 		errS := r.Get(ctx, types.NamespacedName{Name: mig.Spec.PodName, Namespace: mig.Spec.Namespace}, source)
 		ghost := &corev1.Pod{}
-		errG := r.Get(ctx, types.NamespacedName{Name: mig.Spec.PodName + "-ghost", Namespace: mig.Spec.Namespace}, ghost)
+		errG := r.Get(ctx, types.NamespacedName{Name: ghostName, Namespace: mig.Spec.Namespace}, ghost)
 
-		if !errors.IsNotFound(errS) || !errors.IsNotFound(errG) {
-			if errS == nil {
-				l.Info("RESYNC: Performing Final Capture before deleting source")
-				sourceNode := &corev1.Node{}
-				r.Get(ctx, types.NamespacedName{Name: mig.Spec.SourceNode}, sourceNode)
-				sourceIP, _ := getNodeInternalIP(sourceNode)
-				targetNode := &corev1.Node{}
-				r.Get(ctx, types.NamespacedName{Name: mig.Spec.TargetNode}, targetNode)
-				targetIP, _ := getNodeInternalIP(targetNode)
-				r.callAgentStart(ctx, sourceIP, targetIP, mig.Spec.PodName, mig.Spec.Namespace, source.Status.ContainerStatuses[0].ContainerID)
-			}
+		if errS == nil {
+			l.Info("RESYNC: Performing Final Capture before deleting source")
+			sourceNode := &corev1.Node{}
+			r.Get(ctx, types.NamespacedName{Name: mig.Spec.SourceNode}, sourceNode)
+			sourceIP, _ := getNodeInternalIP(sourceNode)
+			targetNode := &corev1.Node{}
+			r.Get(ctx, types.NamespacedName{Name: mig.Spec.TargetNode}, targetNode)
+			targetIP, _ := getNodeInternalIP(targetNode)
+			r.callAgentStart(ctx, sourceIP, targetIP, mig.Spec.PodName, mig.Spec.Namespace, source.Status.ContainerStatuses[0].ContainerID)
 
-			l.Info("Cleanup old pods")
+			l.Info("Deleting source pod")
 			gp := int64(0)
-			if errS == nil {
-				r.Delete(ctx, source, &client.DeleteOptions{GracePeriodSeconds: &gp})
-			}
-			if errG == nil {
-				r.Delete(ctx, ghost, &client.DeleteOptions{GracePeriodSeconds: &gp})
-			}
+			r.Delete(ctx, source, &client.DeleteOptions{GracePeriodSeconds: &gp})
 			return ctrl.Result{RequeueAfter: 1 * time.Second}, nil
 		}
 
-		l.Info("Creating final pod")
-		finalPod := &corev1.Pod{
-			ObjectMeta: metav1.ObjectMeta{Name: mig.Spec.PodName, Namespace: mig.Spec.Namespace},
-			Spec: corev1.PodSpec{
-				NodeName:   mig.Spec.TargetNode,
-				Containers: []corev1.Container{{Name: "ubuntu", Image: "ubuntu", Command: []string{"sleep", "infinity"}}},
-			},
-		}
-		if err := r.Create(ctx, finalPod); err != nil {
-			return ctrl.Result{RequeueAfter: 1 * time.Second}, nil
-		}
-
-		targetNode := &corev1.Node{}
-		r.Get(ctx, types.NamespacedName{Name: mig.Spec.TargetNode}, targetNode)
-		targetIP, _ := getNodeInternalIP(targetNode)
-
-		for i := 0; i < 20; i++ {
-			p := &corev1.Pod{}
-			r.Get(ctx, types.NamespacedName{Name: mig.Spec.PodName, Namespace: mig.Spec.Namespace}, p)
-			if len(p.Status.ContainerStatuses) > 0 && p.Status.ContainerStatuses[0].ContainerID != "" {
-				l.Info("Final Injection into Permanent Pod")
-				r.callAgentApply(ctx, targetIP, mig.Spec.PodName, mig.Spec.Namespace, p.Status.ContainerStatuses[0].ContainerID)
-				break
+		if errG == nil && ghost != nil {
+			l.Info("Renaming ghost pod to final name", "ghostName", ghostName, "finalName", mig.Spec.PodName, "ip", ghost.Status.PodIP)
+			patch := client.MergeFrom(ghost.DeepCopy())
+			ghost.Name = mig.Spec.PodName
+			if err := r.Patch(ctx, ghost, patch); err != nil {
+				l.Error(err, "Failed to rename ghost pod, will retry", "error", err.Error())
+				return ctrl.Result{RequeueAfter: 2 * time.Second}, nil
 			}
-			time.Sleep(1 * time.Second)
+
+			mig.Status.Phase = migrationv1alpha1.PodMigrationPhaseCompleted
+			mig.Status.Message = "Successful"
+			r.Update(ctx, mig)
+			return ctrl.Result{}, nil
 		}
 
-		mig.Status.Phase = migrationv1alpha1.PodMigrationPhaseCompleted
-		mig.Status.Message = "Successful"
+		mig.Status.Phase = migrationv1alpha1.PodMigrationPhaseFailed
+		mig.Status.Message = "Ghost pod not found"
 		r.Update(ctx, mig)
 		return ctrl.Result{}, nil
 
