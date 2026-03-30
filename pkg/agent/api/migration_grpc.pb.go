@@ -23,6 +23,8 @@ const (
 	Migration_StartMigration_FullMethodName     = "/api.Migration/StartMigration"
 	Migration_ApplyLayer_FullMethodName         = "/api.Migration/ApplyLayer"
 	Migration_SignalHandover_FullMethodName     = "/api.Migration/SignalHandover"
+	Migration_StartTap_FullMethodName           = "/api.Migration/StartTap"
+	Migration_StopTap_FullMethodName            = "/api.Migration/StopTap"
 	Migration_TransferMemory_FullMethodName     = "/api.Migration/TransferMemory"
 	Migration_TransferFilesystem_FullMethodName = "/api.Migration/TransferFilesystem"
 )
@@ -35,6 +37,8 @@ type MigrationClient interface {
 	StartMigration(ctx context.Context, in *StartMigrationRequest, opts ...grpc.CallOption) (*StartMigrationResponse, error)
 	ApplyLayer(ctx context.Context, in *ApplyLayerRequest, opts ...grpc.CallOption) (*ApplyLayerResponse, error)
 	SignalHandover(ctx context.Context, in *SignalHandoverRequest, opts ...grpc.CallOption) (*SignalHandoverResponse, error)
+	StartTap(ctx context.Context, in *StartTapRequest, opts ...grpc.CallOption) (*StartTapResponse, error)
+	StopTap(ctx context.Context, in *StopTapRequest, opts ...grpc.CallOption) (*StopTapResponse, error)
 	TransferMemory(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[MemoryChunk, TransferResponse], error)
 	TransferFilesystem(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[FileChunk, TransferResponse], error)
 }
@@ -87,6 +91,26 @@ func (c *migrationClient) SignalHandover(ctx context.Context, in *SignalHandover
 	return out, nil
 }
 
+func (c *migrationClient) StartTap(ctx context.Context, in *StartTapRequest, opts ...grpc.CallOption) (*StartTapResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartTapResponse)
+	err := c.cc.Invoke(ctx, Migration_StartTap_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *migrationClient) StopTap(ctx context.Context, in *StopTapRequest, opts ...grpc.CallOption) (*StopTapResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StopTapResponse)
+	err := c.cc.Invoke(ctx, Migration_StopTap_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *migrationClient) TransferMemory(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[MemoryChunk, TransferResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &Migration_ServiceDesc.Streams[0], Migration_TransferMemory_FullMethodName, cOpts...)
@@ -121,6 +145,8 @@ type MigrationServer interface {
 	StartMigration(context.Context, *StartMigrationRequest) (*StartMigrationResponse, error)
 	ApplyLayer(context.Context, *ApplyLayerRequest) (*ApplyLayerResponse, error)
 	SignalHandover(context.Context, *SignalHandoverRequest) (*SignalHandoverResponse, error)
+	StartTap(context.Context, *StartTapRequest) (*StartTapResponse, error)
+	StopTap(context.Context, *StopTapRequest) (*StopTapResponse, error)
 	TransferMemory(grpc.ClientStreamingServer[MemoryChunk, TransferResponse]) error
 	TransferFilesystem(grpc.ClientStreamingServer[FileChunk, TransferResponse]) error
 	mustEmbedUnimplementedMigrationServer()
@@ -144,6 +170,12 @@ func (UnimplementedMigrationServer) ApplyLayer(context.Context, *ApplyLayerReque
 }
 func (UnimplementedMigrationServer) SignalHandover(context.Context, *SignalHandoverRequest) (*SignalHandoverResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SignalHandover not implemented")
+}
+func (UnimplementedMigrationServer) StartTap(context.Context, *StartTapRequest) (*StartTapResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartTap not implemented")
+}
+func (UnimplementedMigrationServer) StopTap(context.Context, *StopTapRequest) (*StopTapResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StopTap not implemented")
 }
 func (UnimplementedMigrationServer) TransferMemory(grpc.ClientStreamingServer[MemoryChunk, TransferResponse]) error {
 	return status.Error(codes.Unimplemented, "method TransferMemory not implemented")
@@ -244,6 +276,42 @@ func _Migration_SignalHandover_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Migration_StartTap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartTapRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MigrationServer).StartTap(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Migration_StartTap_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MigrationServer).StartTap(ctx, req.(*StartTapRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Migration_StopTap_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StopTapRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MigrationServer).StopTap(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Migration_StopTap_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MigrationServer).StopTap(ctx, req.(*StopTapRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Migration_TransferMemory_Handler(srv interface{}, stream grpc.ServerStream) error {
 	return srv.(MigrationServer).TransferMemory(&grpc.GenericServerStream[MemoryChunk, TransferResponse]{ServerStream: stream})
 }
@@ -280,6 +348,14 @@ var Migration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SignalHandover",
 			Handler:    _Migration_SignalHandover_Handler,
+		},
+		{
+			MethodName: "StartTap",
+			Handler:    _Migration_StartTap_Handler,
+		},
+		{
+			MethodName: "StopTap",
+			Handler:    _Migration_StopTap_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

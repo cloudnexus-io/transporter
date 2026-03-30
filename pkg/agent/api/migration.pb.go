@@ -617,6 +617,262 @@ func (x *TransferResponse) GetMessage() string {
 	return ""
 }
 
+type StartTapRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PodName       string                 `protobuf:"bytes,1,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
+	PodNamespace  string                 `protobuf:"bytes,2,opt,name=pod_namespace,json=podNamespace,proto3" json:"pod_namespace,omitempty"`
+	SourcePodIp   string                 `protobuf:"bytes,3,opt,name=source_pod_ip,json=sourcePodIp,proto3" json:"source_pod_ip,omitempty"`
+	TargetNodeIp  string                 `protobuf:"bytes,4,opt,name=target_node_ip,json=targetNodeIp,proto3" json:"target_node_ip,omitempty"`
+	TargetPort    int32                  `protobuf:"varint,5,opt,name=target_port,json=targetPort,proto3" json:"target_port,omitempty"`
+	AppPort       int32                  `protobuf:"varint,6,opt,name=app_port,json=appPort,proto3" json:"app_port,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartTapRequest) Reset() {
+	*x = StartTapRequest{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartTapRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartTapRequest) ProtoMessage() {}
+
+func (x *StartTapRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartTapRequest.ProtoReflect.Descriptor instead.
+func (*StartTapRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *StartTapRequest) GetPodName() string {
+	if x != nil {
+		return x.PodName
+	}
+	return ""
+}
+
+func (x *StartTapRequest) GetPodNamespace() string {
+	if x != nil {
+		return x.PodNamespace
+	}
+	return ""
+}
+
+func (x *StartTapRequest) GetSourcePodIp() string {
+	if x != nil {
+		return x.SourcePodIp
+	}
+	return ""
+}
+
+func (x *StartTapRequest) GetTargetNodeIp() string {
+	if x != nil {
+		return x.TargetNodeIp
+	}
+	return ""
+}
+
+func (x *StartTapRequest) GetTargetPort() int32 {
+	if x != nil {
+		return x.TargetPort
+	}
+	return 0
+}
+
+func (x *StartTapRequest) GetAppPort() int32 {
+	if x != nil {
+		return x.AppPort
+	}
+	return 0
+}
+
+type StartTapResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartTapResponse) Reset() {
+	*x = StartTapResponse{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartTapResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartTapResponse) ProtoMessage() {}
+
+func (x *StartTapResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartTapResponse.ProtoReflect.Descriptor instead.
+func (*StartTapResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *StartTapResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *StartTapResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type StopTapRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PodName       string                 `protobuf:"bytes,1,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
+	PodNamespace  string                 `protobuf:"bytes,2,opt,name=pod_namespace,json=podNamespace,proto3" json:"pod_namespace,omitempty"`
+	SourcePodIp   string                 `protobuf:"bytes,3,opt,name=source_pod_ip,json=sourcePodIp,proto3" json:"source_pod_ip,omitempty"`
+	TargetPort    int32                  `protobuf:"varint,4,opt,name=target_port,json=targetPort,proto3" json:"target_port,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StopTapRequest) Reset() {
+	*x = StopTapRequest{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StopTapRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StopTapRequest) ProtoMessage() {}
+
+func (x *StopTapRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StopTapRequest.ProtoReflect.Descriptor instead.
+func (*StopTapRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *StopTapRequest) GetPodName() string {
+	if x != nil {
+		return x.PodName
+	}
+	return ""
+}
+
+func (x *StopTapRequest) GetPodNamespace() string {
+	if x != nil {
+		return x.PodNamespace
+	}
+	return ""
+}
+
+func (x *StopTapRequest) GetSourcePodIp() string {
+	if x != nil {
+		return x.SourcePodIp
+	}
+	return ""
+}
+
+func (x *StopTapRequest) GetTargetPort() int32 {
+	if x != nil {
+		return x.TargetPort
+	}
+	return 0
+}
+
+type StopTapResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StopTapResponse) Reset() {
+	*x = StopTapResponse{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StopTapResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StopTapResponse) ProtoMessage() {}
+
+func (x *StopTapResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StopTapResponse.ProtoReflect.Descriptor instead.
+func (*StopTapResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *StopTapResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *StopTapResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_pkg_agent_api_migration_proto protoreflect.FileDescriptor
 
 const file_pkg_agent_api_migration_proto_rawDesc = "" +
@@ -657,13 +913,35 @@ const file_pkg_agent_api_migration_proto_rawDesc = "" +
 	"\x04data\x18\x02 \x01(\fR\x04data\"F\n" +
 	"\x10TransferResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x9e\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xd7\x01\n" +
+	"\x0fStartTapRequest\x12\x19\n" +
+	"\bpod_name\x18\x01 \x01(\tR\apodName\x12#\n" +
+	"\rpod_namespace\x18\x02 \x01(\tR\fpodNamespace\x12\"\n" +
+	"\rsource_pod_ip\x18\x03 \x01(\tR\vsourcePodIp\x12$\n" +
+	"\x0etarget_node_ip\x18\x04 \x01(\tR\ftargetNodeIp\x12\x1f\n" +
+	"\vtarget_port\x18\x05 \x01(\x05R\n" +
+	"targetPort\x12\x19\n" +
+	"\bapp_port\x18\x06 \x01(\x05R\aappPort\"F\n" +
+	"\x10StartTapResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x95\x01\n" +
+	"\x0eStopTapRequest\x12\x19\n" +
+	"\bpod_name\x18\x01 \x01(\tR\apodName\x12#\n" +
+	"\rpod_namespace\x18\x02 \x01(\tR\fpodNamespace\x12\"\n" +
+	"\rsource_pod_ip\x18\x03 \x01(\tR\vsourcePodIp\x12\x1f\n" +
+	"\vtarget_port\x18\x04 \x01(\x05R\n" +
+	"targetPort\"E\n" +
+	"\x0fStopTapResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x91\x04\n" +
 	"\tMigration\x126\n" +
 	"\aPrepare\x12\x13.api.PrepareRequest\x1a\x14.api.PrepareResponse\"\x00\x12K\n" +
 	"\x0eStartMigration\x12\x1a.api.StartMigrationRequest\x1a\x1b.api.StartMigrationResponse\"\x00\x12?\n" +
 	"\n" +
 	"ApplyLayer\x12\x16.api.ApplyLayerRequest\x1a\x17.api.ApplyLayerResponse\"\x00\x12K\n" +
-	"\x0eSignalHandover\x12\x1a.api.SignalHandoverRequest\x1a\x1b.api.SignalHandoverResponse\"\x00\x12=\n" +
+	"\x0eSignalHandover\x12\x1a.api.SignalHandoverRequest\x1a\x1b.api.SignalHandoverResponse\"\x00\x129\n" +
+	"\bStartTap\x12\x14.api.StartTapRequest\x1a\x15.api.StartTapResponse\"\x00\x126\n" +
+	"\aStopTap\x12\x13.api.StopTapRequest\x1a\x14.api.StopTapResponse\"\x00\x12=\n" +
 	"\x0eTransferMemory\x12\x10.api.MemoryChunk\x1a\x15.api.TransferResponse\"\x00(\x01\x12?\n" +
 	"\x12TransferFilesystem\x12\x0e.api.FileChunk\x1a\x15.api.TransferResponse\"\x00(\x01B\x1bZ\x19transporter/pkg/agent/apib\x06proto3"
 
@@ -679,7 +957,7 @@ func file_pkg_agent_api_migration_proto_rawDescGZIP() []byte {
 	return file_pkg_agent_api_migration_proto_rawDescData
 }
 
-var file_pkg_agent_api_migration_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_pkg_agent_api_migration_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_pkg_agent_api_migration_proto_goTypes = []any{
 	(*PrepareRequest)(nil),         // 0: api.PrepareRequest
 	(*PrepareResponse)(nil),        // 1: api.PrepareResponse
@@ -692,22 +970,30 @@ var file_pkg_agent_api_migration_proto_goTypes = []any{
 	(*MemoryChunk)(nil),            // 8: api.MemoryChunk
 	(*FileChunk)(nil),              // 9: api.FileChunk
 	(*TransferResponse)(nil),       // 10: api.TransferResponse
+	(*StartTapRequest)(nil),        // 11: api.StartTapRequest
+	(*StartTapResponse)(nil),       // 12: api.StartTapResponse
+	(*StopTapRequest)(nil),         // 13: api.StopTapRequest
+	(*StopTapResponse)(nil),        // 14: api.StopTapResponse
 }
 var file_pkg_agent_api_migration_proto_depIdxs = []int32{
 	0,  // 0: api.Migration.Prepare:input_type -> api.PrepareRequest
 	2,  // 1: api.Migration.StartMigration:input_type -> api.StartMigrationRequest
 	4,  // 2: api.Migration.ApplyLayer:input_type -> api.ApplyLayerRequest
 	6,  // 3: api.Migration.SignalHandover:input_type -> api.SignalHandoverRequest
-	8,  // 4: api.Migration.TransferMemory:input_type -> api.MemoryChunk
-	9,  // 5: api.Migration.TransferFilesystem:input_type -> api.FileChunk
-	1,  // 6: api.Migration.Prepare:output_type -> api.PrepareResponse
-	3,  // 7: api.Migration.StartMigration:output_type -> api.StartMigrationResponse
-	5,  // 8: api.Migration.ApplyLayer:output_type -> api.ApplyLayerResponse
-	7,  // 9: api.Migration.SignalHandover:output_type -> api.SignalHandoverResponse
-	10, // 10: api.Migration.TransferMemory:output_type -> api.TransferResponse
-	10, // 11: api.Migration.TransferFilesystem:output_type -> api.TransferResponse
-	6,  // [6:12] is the sub-list for method output_type
-	0,  // [0:6] is the sub-list for method input_type
+	11, // 4: api.Migration.StartTap:input_type -> api.StartTapRequest
+	13, // 5: api.Migration.StopTap:input_type -> api.StopTapRequest
+	8,  // 6: api.Migration.TransferMemory:input_type -> api.MemoryChunk
+	9,  // 7: api.Migration.TransferFilesystem:input_type -> api.FileChunk
+	1,  // 8: api.Migration.Prepare:output_type -> api.PrepareResponse
+	3,  // 9: api.Migration.StartMigration:output_type -> api.StartMigrationResponse
+	5,  // 10: api.Migration.ApplyLayer:output_type -> api.ApplyLayerResponse
+	7,  // 11: api.Migration.SignalHandover:output_type -> api.SignalHandoverResponse
+	12, // 12: api.Migration.StartTap:output_type -> api.StartTapResponse
+	14, // 13: api.Migration.StopTap:output_type -> api.StopTapResponse
+	10, // 14: api.Migration.TransferMemory:output_type -> api.TransferResponse
+	10, // 15: api.Migration.TransferFilesystem:output_type -> api.TransferResponse
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -724,7 +1010,7 @@ func file_pkg_agent_api_migration_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_agent_api_migration_proto_rawDesc), len(file_pkg_agent_api_migration_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

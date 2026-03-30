@@ -74,6 +74,40 @@ func (r *PodMigrationReconciler) callAgentApply(ctx context.Context, nodeIP stri
 	return nil
 }
 
+func (r *PodMigrationReconciler) callStartTap(ctx context.Context, sourceNodeIP, sourcePodIP, targetNodeIP string, targetPort, appPort int, podName, podNamespace string) error {
+	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", sourceNodeIP, agentPort), grpc.WithInsecure())
+	defer conn.Close()
+	client := pb.NewMigrationClient(conn)
+	resp, err := client.StartTap(ctx, &pb.StartTapRequest{
+		PodName:      podName,
+		PodNamespace: podNamespace,
+		SourcePodIp:  sourcePodIP,
+		TargetNodeIp: targetNodeIP,
+		TargetPort:   int32(targetPort),
+		AppPort:      int32(appPort),
+	})
+	if err != nil || !resp.Success {
+		return fmt.Errorf("start tap failed: %v", resp.GetMessage())
+	}
+	return nil
+}
+
+func (r *PodMigrationReconciler) callStopTap(ctx context.Context, sourceNodeIP, sourcePodIP string, targetPort int, podName, podNamespace string) error {
+	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", sourceNodeIP, agentPort), grpc.WithInsecure())
+	defer conn.Close()
+	client := pb.NewMigrationClient(conn)
+	resp, err := client.StopTap(ctx, &pb.StopTapRequest{
+		PodName:      podName,
+		PodNamespace: podNamespace,
+		SourcePodIp:  sourcePodIP,
+		TargetPort:   int32(targetPort),
+	})
+	if err != nil || !resp.Success {
+		return fmt.Errorf("stop tap failed: %v", resp.GetMessage())
+	}
+	return nil
+}
+
 func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 	mig := &migrationv1alpha1.PodMigration{}
@@ -144,9 +178,11 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 
 			ghost = &corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
-					Name:        ghostName,
-					Namespace:   mig.Spec.Namespace,
-					Annotations: map[string]string{"ipam.alpha.kubernetes.io/ips": originalIP},
+					Name:      ghostName,
+					Namespace: mig.Spec.Namespace,
+					Annotations: map[string]string{
+						"k8s.v1.cni.cncf.io/ips": originalIP,
+					},
 				},
 				Spec: *podSpec,
 			}
@@ -164,16 +200,31 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		targetNode := &corev1.Node{}
 		r.Get(ctx, types.NamespacedName{Name: mig.Spec.TargetNode}, targetNode)
 		targetIP, _ := getNodeInternalIP(targetNode)
-		r.callAgentPrepare(ctx, targetIP, mig.Spec.PodName, mig.Spec.Namespace)
 
 		sourcePod := &corev1.Pod{}
 		r.Get(ctx, types.NamespacedName{Name: mig.Spec.PodName, Namespace: mig.Spec.Namespace}, sourcePod)
 		sourceNode := &corev1.Node{}
 		r.Get(ctx, types.NamespacedName{Name: mig.Spec.SourceNode}, sourceNode)
-		sourceIP, _ := getNodeInternalIP(sourceNode)
+		sourceNodeIP, _ := getNodeInternalIP(sourceNode)
+		sourcePodIP := sourcePod.Status.PodIP
+
+		appPort := 80
+		for _, c := range sourcePod.Spec.Containers {
+			for _, p := range c.Ports {
+				if p.ContainerPort > 0 {
+					appPort = int(p.ContainerPort)
+					break
+				}
+			}
+		}
+
+		r.callAgentPrepare(ctx, targetIP, mig.Spec.PodName, mig.Spec.Namespace)
+
+		l.Info("Starting TAP on source node", "sourceNode", sourceNodeIP, "sourcePodIP", sourcePodIP, "targetNode", targetIP)
+		r.callStartTap(ctx, sourceNodeIP, sourcePodIP, targetIP, 50052, appPort, mig.Spec.PodName, mig.Spec.Namespace)
 
 		l.Info("GHOST-SYNC: Capture Source -> Store")
-		if err := r.callAgentStart(ctx, sourceIP, targetIP, mig.Spec.PodName, mig.Spec.Namespace, sourcePod.Status.ContainerStatuses[0].ContainerID); err != nil {
+		if err := r.callAgentStart(ctx, sourceNodeIP, targetIP, mig.Spec.PodName, mig.Spec.Namespace, sourcePod.Status.ContainerStatuses[0].ContainerID); err != nil {
 			return ctrl.Result{}, err
 		}
 
@@ -209,12 +260,28 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		}
 
 		if errG == nil && ghost != nil {
-			l.Info("Renaming ghost pod to final name", "ghostName", ghostName, "finalName", mig.Spec.PodName, "ip", ghost.Status.PodIP)
-			patch := client.MergeFrom(ghost.DeepCopy())
-			ghost.Name = mig.Spec.PodName
-			if err := r.Patch(ctx, ghost, patch); err != nil {
-				l.Error(err, "Failed to rename ghost pod, will retry", "error", err.Error())
+			l.Info("Creating final pod with original name", "ghostName", ghostName, "finalName", mig.Spec.PodName, "ip", ghost.Status.PodIP)
+
+			finalPod := ghost.DeepCopy()
+			finalPod.Name = mig.Spec.PodName
+			finalPod.ResourceVersion = ""
+			finalPod.UID = ""
+			finalPod.CreationTimestamp = metav1.Time{}
+			if finalPod.Labels != nil {
+				delete(finalPod.Labels, "transporter.ghost")
+			}
+			if finalPod.Annotations != nil {
+				delete(finalPod.Annotations, "k8s.v1.cni.cncf.io/ips")
+			}
+
+			if err := r.Create(ctx, finalPod); err != nil {
+				l.Error(err, "Failed to create final pod, will retry", "error", err.Error())
 				return ctrl.Result{RequeueAfter: 2 * time.Second}, nil
+			}
+
+			l.Info("Deleting ghost pod", "ghostName", ghostName)
+			if err := r.Delete(ctx, ghost); err != nil {
+				l.Error(err, "Failed to delete ghost pod", "error", err.Error())
 			}
 
 			mig.Status.Phase = migrationv1alpha1.PodMigrationPhaseCompleted
