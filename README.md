@@ -29,8 +29,7 @@ Transporter implements **live pod migration** by:
 - **Zero-downtime migration**: Active connections are buffered and handed over seamlessly
 - **Kubernetes Native**: Uses CRDs and operator pattern
 - **On-Demand Sidecars**: Only injects sidecar during migration, not on all pods
-- **No IP changes**: Application retains its network identity (with compatible CNI)
-- **State preservation**: Uses CRIU for checkpoint/restore with filesystem overlay capture
+- **State preservation**: Filesystem changes are transferred to target node and restored
 
 ---
 
@@ -495,9 +494,9 @@ Transporter uses CRIU for checkpoint/restore. Key considerations:
 ### Limitations
 
 - **Same container runtime**: Source and target must both use containerd
-- **Compatible CNI**: For IP preservation, CNI must support cluster-wide IPAM
 - **Process namespace**: Requires `shareProcessNamespace: true`
 - **Privileged operations**: Agent requires NET_ADMIN capabilities
+- **IP changes**: Pod receives new IP from target node's CIDR after migration
 
 ---
 
