@@ -224,6 +224,64 @@ func (s *agentServer) TransferFilesystem(stream pb.Migration_TransferFilesystemS
 	return stream.SendAndClose(&pb.TransferResponse{Success: true})
 }
 
+func (s *agentServer) TransferFilesystemToNode(ctx context.Context, in *pb.TransferToNodeRequest) (*pb.TransferToNodeResponse, error) {
+	fmt.Printf("TRANSFER FILESYSTEM to %s for pod %s\n", in.TargetAddress, in.PodName)
+
+	conn, err := grpc.Dial(in.TargetAddress, grpc.WithInsecure())
+	if err != nil {
+		return &pb.TransferToNodeResponse{Success: false, Message: err.Error()}, nil
+	}
+	defer conn.Close()
+
+	client := pb.NewMigrationClient(conn)
+	stream, err := client.TransferFilesystem(ctx)
+	if err != nil {
+		return &pb.TransferToNodeResponse{Success: false, Message: err.Error()}, nil
+	}
+
+	podStorePath := filepath.Join("/host", hostStore, in.PodName)
+
+	err = filepath.Walk(podStorePath, func(path string, info os.FileInfo, err error) error {
+		if err != nil || info.IsDir() {
+			return nil
+		}
+		relPath, _ := filepath.Rel(podStorePath, path)
+
+		file, err := os.Open(path)
+		if err != nil {
+			return nil
+		}
+		defer file.Close()
+
+		buffer := make([]byte, 1024*1024)
+		for {
+			n, err := file.Read(buffer)
+			if n > 0 {
+				stream.Send(&pb.FileChunk{Path: relPath, Data: buffer[:n]})
+			}
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return &pb.TransferToNodeResponse{Success: false, Message: err.Error()}, nil
+	}
+
+	resp, err := stream.CloseAndRecv()
+	if err != nil || !resp.Success {
+		return &pb.TransferToNodeResponse{Success: false, Message: resp.GetMessage()}, nil
+	}
+
+	fmt.Printf("FILESYSTEM TRANSFERRED to %s for pod %s\n", in.TargetAddress, in.PodName)
+	return &pb.TransferToNodeResponse{Success: true, Message: "Transferred"}, nil
+}
+
 func getProcessCgroup(pid int) (string, error) {
 	data, err := os.ReadFile(fmt.Sprintf("/host/proc/%d/cgroup", pid))
 	if err != nil {
