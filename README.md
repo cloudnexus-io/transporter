@@ -398,6 +398,26 @@ transporter migrate web-0 -n production -t node-01
     └──────────┘
 ```
 
+### Environment Variables (Controller)
+
+The PodMigration controller accepts these environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `TRANSPORTER_SIDECAR_IMAGE` | "transporter-proxy:latest" | Sidecar image to inject into Ghost Pods |
+
+**Via Helm:**
+```yaml
+# values.yaml
+sidecar:
+  image: "my-registry.com/transporter-proxy:v1.0.0"
+```
+
+Or via command line:
+```bash
+helm install transporter ./helm-chart --set sidecar.image=my-registry.com/transporter-proxy:v1.0.0
+```
+
 ### Environment Variables (Sidecar)
 
 The transporter-proxy sidecar uses these environment variables:

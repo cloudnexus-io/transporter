@@ -2,23 +2,31 @@ package sidecar
 
 import (
 	"fmt"
+	"os"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
-	SidecarImage   = "192.168.1.20:5000/transporter-proxy:latest"
-	SidecarName    = "transporter-proxy"
-	SidecarPort    = 50052
-	ManagementPort = 50053
-	AppPort        = 80
+	SidecarImageDefault = "transporter-proxy:latest"
+	SidecarName         = "transporter-proxy"
+	SidecarPort         = 50052
+	ManagementPort      = 50053
+	AppPort             = 80
 )
+
+func GetSidecarImage() string {
+	if img := os.Getenv("TRANSPORTER_SIDECAR_IMAGE"); img != "" {
+		return img
+	}
+	return SidecarImageDefault
+}
 
 func InjectSidecar(podSpec *corev1.PodSpec, targetIP string, appPort int) {
 	sidecar := corev1.Container{
 		Name:  SidecarName,
-		Image: SidecarImage,
+		Image: GetSidecarImage(),
 		Ports: []corev1.ContainerPort{
 			{Name: "proxy", ContainerPort: int32(SidecarPort)},
 			{Name: "mgmt", ContainerPort: int32(ManagementPort)},
@@ -53,7 +61,7 @@ func InjectSidecar(podSpec *corev1.PodSpec, targetIP string, appPort int) {
 func InjectEBPFSidecar(podSpec *corev1.PodSpec, sourcePodIP, targetNodeIP string, appPort int) {
 	sidecar := corev1.Container{
 		Name:  "transporter-tap",
-		Image: SidecarImage,
+		Image: GetSidecarImage(),
 		Ports: []corev1.ContainerPort{
 			{Name: "tap", ContainerPort: int32(ManagementPort)},
 		},

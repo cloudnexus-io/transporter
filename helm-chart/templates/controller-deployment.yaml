@@ -31,6 +31,14 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
+          env:
+            {{- if .Values.sidecar.image }}
+            - name: TRANSPORTER_SIDECAR_IMAGE
+              value: {{ .Values.sidecar.image | quote }}
+            {{- end }}
+            {{- with .Values.controller.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - containerPort: 8081
               name: healthz
