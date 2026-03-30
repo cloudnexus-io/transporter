@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Migration_Prepare_FullMethodName            = "/api.Migration/Prepare"
-	Migration_StartMigration_FullMethodName     = "/api.Migration/StartMigration"
-	Migration_ApplyLayer_FullMethodName         = "/api.Migration/ApplyLayer"
-	Migration_SignalHandover_FullMethodName     = "/api.Migration/SignalHandover"
-	Migration_StartTap_FullMethodName           = "/api.Migration/StartTap"
-	Migration_StopTap_FullMethodName            = "/api.Migration/StopTap"
-	Migration_TransferMemory_FullMethodName     = "/api.Migration/TransferMemory"
-	Migration_TransferFilesystem_FullMethodName = "/api.Migration/TransferFilesystem"
+	Migration_Prepare_FullMethodName                  = "/api.Migration/Prepare"
+	Migration_StartMigration_FullMethodName           = "/api.Migration/StartMigration"
+	Migration_ApplyLayer_FullMethodName               = "/api.Migration/ApplyLayer"
+	Migration_SignalHandover_FullMethodName           = "/api.Migration/SignalHandover"
+	Migration_StartTap_FullMethodName                 = "/api.Migration/StartTap"
+	Migration_StopTap_FullMethodName                  = "/api.Migration/StopTap"
+	Migration_TransferMemory_FullMethodName           = "/api.Migration/TransferMemory"
+	Migration_TransferFilesystem_FullMethodName       = "/api.Migration/TransferFilesystem"
+	Migration_TransferFilesystemToNode_FullMethodName = "/api.Migration/TransferFilesystemToNode"
 )
 
 // MigrationClient is the client API for Migration service.
@@ -41,6 +42,7 @@ type MigrationClient interface {
 	StopTap(ctx context.Context, in *StopTapRequest, opts ...grpc.CallOption) (*StopTapResponse, error)
 	TransferMemory(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[MemoryChunk, TransferResponse], error)
 	TransferFilesystem(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[FileChunk, TransferResponse], error)
+	TransferFilesystemToNode(ctx context.Context, in *TransferToNodeRequest, opts ...grpc.CallOption) (*TransferToNodeResponse, error)
 }
 
 type migrationClient struct {
@@ -137,6 +139,16 @@ func (c *migrationClient) TransferFilesystem(ctx context.Context, opts ...grpc.C
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type Migration_TransferFilesystemClient = grpc.ClientStreamingClient[FileChunk, TransferResponse]
 
+func (c *migrationClient) TransferFilesystemToNode(ctx context.Context, in *TransferToNodeRequest, opts ...grpc.CallOption) (*TransferToNodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TransferToNodeResponse)
+	err := c.cc.Invoke(ctx, Migration_TransferFilesystemToNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MigrationServer is the server API for Migration service.
 // All implementations must embed UnimplementedMigrationServer
 // for forward compatibility.
@@ -149,6 +161,7 @@ type MigrationServer interface {
 	StopTap(context.Context, *StopTapRequest) (*StopTapResponse, error)
 	TransferMemory(grpc.ClientStreamingServer[MemoryChunk, TransferResponse]) error
 	TransferFilesystem(grpc.ClientStreamingServer[FileChunk, TransferResponse]) error
+	TransferFilesystemToNode(context.Context, *TransferToNodeRequest) (*TransferToNodeResponse, error)
 	mustEmbedUnimplementedMigrationServer()
 }
 
@@ -182,6 +195,9 @@ func (UnimplementedMigrationServer) TransferMemory(grpc.ClientStreamingServer[Me
 }
 func (UnimplementedMigrationServer) TransferFilesystem(grpc.ClientStreamingServer[FileChunk, TransferResponse]) error {
 	return status.Error(codes.Unimplemented, "method TransferFilesystem not implemented")
+}
+func (UnimplementedMigrationServer) TransferFilesystemToNode(context.Context, *TransferToNodeRequest) (*TransferToNodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TransferFilesystemToNode not implemented")
 }
 func (UnimplementedMigrationServer) mustEmbedUnimplementedMigrationServer() {}
 func (UnimplementedMigrationServer) testEmbeddedByValue()                   {}
@@ -326,6 +342,24 @@ func _Migration_TransferFilesystem_Handler(srv interface{}, stream grpc.ServerSt
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type Migration_TransferFilesystemServer = grpc.ClientStreamingServer[FileChunk, TransferResponse]
 
+func _Migration_TransferFilesystemToNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferToNodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MigrationServer).TransferFilesystemToNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Migration_TransferFilesystemToNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MigrationServer).TransferFilesystemToNode(ctx, req.(*TransferToNodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Migration_ServiceDesc is the grpc.ServiceDesc for Migration service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -356,6 +390,10 @@ var Migration_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StopTap",
 			Handler:    _Migration_StopTap_Handler,
+		},
+		{
+			MethodName: "TransferFilesystemToNode",
+			Handler:    _Migration_TransferFilesystemToNode_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
