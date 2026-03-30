@@ -357,110 +357,6 @@ func (x *ApplyLayerResponse) GetMessage() string {
 	return ""
 }
 
-type SignalHandoverRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PodName       string                 `protobuf:"bytes,1,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
-	PodNamespace  string                 `protobuf:"bytes,2,opt,name=pod_namespace,json=podNamespace,proto3" json:"pod_namespace,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SignalHandoverRequest) Reset() {
-	*x = SignalHandoverRequest{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SignalHandoverRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SignalHandoverRequest) ProtoMessage() {}
-
-func (x *SignalHandoverRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SignalHandoverRequest.ProtoReflect.Descriptor instead.
-func (*SignalHandoverRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SignalHandoverRequest) GetPodName() string {
-	if x != nil {
-		return x.PodName
-	}
-	return ""
-}
-
-func (x *SignalHandoverRequest) GetPodNamespace() string {
-	if x != nil {
-		return x.PodNamespace
-	}
-	return ""
-}
-
-type SignalHandoverResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SignalHandoverResponse) Reset() {
-	*x = SignalHandoverResponse{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SignalHandoverResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SignalHandoverResponse) ProtoMessage() {}
-
-func (x *SignalHandoverResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SignalHandoverResponse.ProtoReflect.Descriptor instead.
-func (*SignalHandoverResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *SignalHandoverResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *SignalHandoverResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 type MemoryChunk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Data          []byte                 `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
@@ -471,7 +367,7 @@ type MemoryChunk struct {
 
 func (x *MemoryChunk) Reset() {
 	*x = MemoryChunk{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[8]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -483,7 +379,7 @@ func (x *MemoryChunk) String() string {
 func (*MemoryChunk) ProtoMessage() {}
 
 func (x *MemoryChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[8]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -496,7 +392,7 @@ func (x *MemoryChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MemoryChunk.ProtoReflect.Descriptor instead.
 func (*MemoryChunk) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{8}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MemoryChunk) GetData() []byte {
@@ -523,7 +419,7 @@ type FileChunk struct {
 
 func (x *FileChunk) Reset() {
 	*x = FileChunk{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[9]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -535,7 +431,7 @@ func (x *FileChunk) String() string {
 func (*FileChunk) ProtoMessage() {}
 
 func (x *FileChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[9]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -548,7 +444,7 @@ func (x *FileChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileChunk.ProtoReflect.Descriptor instead.
 func (*FileChunk) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{9}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *FileChunk) GetPath() string {
@@ -575,7 +471,7 @@ type TransferResponse struct {
 
 func (x *TransferResponse) Reset() {
 	*x = TransferResponse{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[10]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -587,7 +483,7 @@ func (x *TransferResponse) String() string {
 func (*TransferResponse) ProtoMessage() {}
 
 func (x *TransferResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[10]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -600,7 +496,7 @@ func (x *TransferResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferResponse.ProtoReflect.Descriptor instead.
 func (*TransferResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{10}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TransferResponse) GetSuccess() bool {
@@ -631,7 +527,7 @@ type StartTapRequest struct {
 
 func (x *StartTapRequest) Reset() {
 	*x = StartTapRequest{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -643,7 +539,7 @@ func (x *StartTapRequest) String() string {
 func (*StartTapRequest) ProtoMessage() {}
 
 func (x *StartTapRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -656,7 +552,7 @@ func (x *StartTapRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartTapRequest.ProtoReflect.Descriptor instead.
 func (*StartTapRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{11}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *StartTapRequest) GetPodName() string {
@@ -711,7 +607,7 @@ type StartTapResponse struct {
 
 func (x *StartTapResponse) Reset() {
 	*x = StartTapResponse{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -723,7 +619,7 @@ func (x *StartTapResponse) String() string {
 func (*StartTapResponse) ProtoMessage() {}
 
 func (x *StartTapResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -736,7 +632,7 @@ func (x *StartTapResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartTapResponse.ProtoReflect.Descriptor instead.
 func (*StartTapResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{12}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *StartTapResponse) GetSuccess() bool {
@@ -765,7 +661,7 @@ type StopTapRequest struct {
 
 func (x *StopTapRequest) Reset() {
 	*x = StopTapRequest{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -777,7 +673,7 @@ func (x *StopTapRequest) String() string {
 func (*StopTapRequest) ProtoMessage() {}
 
 func (x *StopTapRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +686,7 @@ func (x *StopTapRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopTapRequest.ProtoReflect.Descriptor instead.
 func (*StopTapRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{13}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *StopTapRequest) GetPodName() string {
@@ -831,7 +727,7 @@ type StopTapResponse struct {
 
 func (x *StopTapResponse) Reset() {
 	*x = StopTapResponse{}
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -843,7 +739,7 @@ func (x *StopTapResponse) String() string {
 func (*StopTapResponse) ProtoMessage() {}
 
 func (x *StopTapResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +752,7 @@ func (x *StopTapResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopTapResponse.ProtoReflect.Descriptor instead.
 func (*StopTapResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{14}
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *StopTapResponse) GetSuccess() bool {
@@ -867,6 +763,214 @@ func (x *StopTapResponse) GetSuccess() bool {
 }
 
 func (x *StopTapResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type SignalHandoverRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PodName       string                 `protobuf:"bytes,1,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
+	PodNamespace  string                 `protobuf:"bytes,2,opt,name=pod_namespace,json=podNamespace,proto3" json:"pod_namespace,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SignalHandoverRequest) Reset() {
+	*x = SignalHandoverRequest{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SignalHandoverRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignalHandoverRequest) ProtoMessage() {}
+
+func (x *SignalHandoverRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignalHandoverRequest.ProtoReflect.Descriptor instead.
+func (*SignalHandoverRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SignalHandoverRequest) GetPodName() string {
+	if x != nil {
+		return x.PodName
+	}
+	return ""
+}
+
+func (x *SignalHandoverRequest) GetPodNamespace() string {
+	if x != nil {
+		return x.PodNamespace
+	}
+	return ""
+}
+
+type SignalHandoverResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SignalHandoverResponse) Reset() {
+	*x = SignalHandoverResponse{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SignalHandoverResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignalHandoverResponse) ProtoMessage() {}
+
+func (x *SignalHandoverResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignalHandoverResponse.ProtoReflect.Descriptor instead.
+func (*SignalHandoverResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SignalHandoverResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SignalHandoverResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type TransferToNodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PodName       string                 `protobuf:"bytes,1,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
+	TargetAddress string                 `protobuf:"bytes,2,opt,name=target_address,json=targetAddress,proto3" json:"target_address,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TransferToNodeRequest) Reset() {
+	*x = TransferToNodeRequest{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransferToNodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransferToNodeRequest) ProtoMessage() {}
+
+func (x *TransferToNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransferToNodeRequest.ProtoReflect.Descriptor instead.
+func (*TransferToNodeRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *TransferToNodeRequest) GetPodName() string {
+	if x != nil {
+		return x.PodName
+	}
+	return ""
+}
+
+func (x *TransferToNodeRequest) GetTargetAddress() string {
+	if x != nil {
+		return x.TargetAddress
+	}
+	return ""
+}
+
+type TransferToNodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TransferToNodeResponse) Reset() {
+	*x = TransferToNodeResponse{}
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TransferToNodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TransferToNodeResponse) ProtoMessage() {}
+
+func (x *TransferToNodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_agent_api_migration_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TransferToNodeResponse.ProtoReflect.Descriptor instead.
+func (*TransferToNodeResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_agent_api_migration_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *TransferToNodeResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *TransferToNodeResponse) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
@@ -898,12 +1002,6 @@ const file_pkg_agent_api_migration_proto_rawDesc = "" +
 	"\fcontainer_id\x18\x03 \x01(\tR\vcontainerId\"H\n" +
 	"\x12ApplyLayerResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"W\n" +
-	"\x15SignalHandoverRequest\x12\x19\n" +
-	"\bpod_name\x18\x01 \x01(\tR\apodName\x12#\n" +
-	"\rpod_namespace\x18\x02 \x01(\tR\fpodNamespace\"L\n" +
-	"\x16SignalHandoverResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"9\n" +
 	"\vMemoryChunk\x12\x12\n" +
 	"\x04data\x18\x01 \x01(\fR\x04data\x12\x16\n" +
@@ -933,7 +1031,19 @@ const file_pkg_agent_api_migration_proto_rawDesc = "" +
 	"targetPort\"E\n" +
 	"\x0fStopTapResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x91\x04\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"W\n" +
+	"\x15SignalHandoverRequest\x12\x19\n" +
+	"\bpod_name\x18\x01 \x01(\tR\apodName\x12#\n" +
+	"\rpod_namespace\x18\x02 \x01(\tR\fpodNamespace\"L\n" +
+	"\x16SignalHandoverResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"Y\n" +
+	"\x15TransferToNodeRequest\x12\x19\n" +
+	"\bpod_name\x18\x01 \x01(\tR\apodName\x12%\n" +
+	"\x0etarget_address\x18\x02 \x01(\tR\rtargetAddress\"L\n" +
+	"\x16TransferToNodeResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xe8\x04\n" +
 	"\tMigration\x126\n" +
 	"\aPrepare\x12\x13.api.PrepareRequest\x1a\x14.api.PrepareResponse\"\x00\x12K\n" +
 	"\x0eStartMigration\x12\x1a.api.StartMigrationRequest\x1a\x1b.api.StartMigrationResponse\"\x00\x12?\n" +
@@ -943,7 +1053,8 @@ const file_pkg_agent_api_migration_proto_rawDesc = "" +
 	"\bStartTap\x12\x14.api.StartTapRequest\x1a\x15.api.StartTapResponse\"\x00\x126\n" +
 	"\aStopTap\x12\x13.api.StopTapRequest\x1a\x14.api.StopTapResponse\"\x00\x12=\n" +
 	"\x0eTransferMemory\x12\x10.api.MemoryChunk\x1a\x15.api.TransferResponse\"\x00(\x01\x12?\n" +
-	"\x12TransferFilesystem\x12\x0e.api.FileChunk\x1a\x15.api.TransferResponse\"\x00(\x01B\x1bZ\x19transporter/pkg/agent/apib\x06proto3"
+	"\x12TransferFilesystem\x12\x0e.api.FileChunk\x1a\x15.api.TransferResponse\"\x00(\x01\x12U\n" +
+	"\x18TransferFilesystemToNode\x12\x1a.api.TransferToNodeRequest\x1a\x1b.api.TransferToNodeResponse\"\x00B\x1bZ\x19transporter/pkg/agent/apib\x06proto3"
 
 var (
 	file_pkg_agent_api_migration_proto_rawDescOnce sync.Once
@@ -957,7 +1068,7 @@ func file_pkg_agent_api_migration_proto_rawDescGZIP() []byte {
 	return file_pkg_agent_api_migration_proto_rawDescData
 }
 
-var file_pkg_agent_api_migration_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_pkg_agent_api_migration_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_pkg_agent_api_migration_proto_goTypes = []any{
 	(*PrepareRequest)(nil),         // 0: api.PrepareRequest
 	(*PrepareResponse)(nil),        // 1: api.PrepareResponse
@@ -965,35 +1076,39 @@ var file_pkg_agent_api_migration_proto_goTypes = []any{
 	(*StartMigrationResponse)(nil), // 3: api.StartMigrationResponse
 	(*ApplyLayerRequest)(nil),      // 4: api.ApplyLayerRequest
 	(*ApplyLayerResponse)(nil),     // 5: api.ApplyLayerResponse
-	(*SignalHandoverRequest)(nil),  // 6: api.SignalHandoverRequest
-	(*SignalHandoverResponse)(nil), // 7: api.SignalHandoverResponse
-	(*MemoryChunk)(nil),            // 8: api.MemoryChunk
-	(*FileChunk)(nil),              // 9: api.FileChunk
-	(*TransferResponse)(nil),       // 10: api.TransferResponse
-	(*StartTapRequest)(nil),        // 11: api.StartTapRequest
-	(*StartTapResponse)(nil),       // 12: api.StartTapResponse
-	(*StopTapRequest)(nil),         // 13: api.StopTapRequest
-	(*StopTapResponse)(nil),        // 14: api.StopTapResponse
+	(*MemoryChunk)(nil),            // 6: api.MemoryChunk
+	(*FileChunk)(nil),              // 7: api.FileChunk
+	(*TransferResponse)(nil),       // 8: api.TransferResponse
+	(*StartTapRequest)(nil),        // 9: api.StartTapRequest
+	(*StartTapResponse)(nil),       // 10: api.StartTapResponse
+	(*StopTapRequest)(nil),         // 11: api.StopTapRequest
+	(*StopTapResponse)(nil),        // 12: api.StopTapResponse
+	(*SignalHandoverRequest)(nil),  // 13: api.SignalHandoverRequest
+	(*SignalHandoverResponse)(nil), // 14: api.SignalHandoverResponse
+	(*TransferToNodeRequest)(nil),  // 15: api.TransferToNodeRequest
+	(*TransferToNodeResponse)(nil), // 16: api.TransferToNodeResponse
 }
 var file_pkg_agent_api_migration_proto_depIdxs = []int32{
 	0,  // 0: api.Migration.Prepare:input_type -> api.PrepareRequest
 	2,  // 1: api.Migration.StartMigration:input_type -> api.StartMigrationRequest
 	4,  // 2: api.Migration.ApplyLayer:input_type -> api.ApplyLayerRequest
-	6,  // 3: api.Migration.SignalHandover:input_type -> api.SignalHandoverRequest
-	11, // 4: api.Migration.StartTap:input_type -> api.StartTapRequest
-	13, // 5: api.Migration.StopTap:input_type -> api.StopTapRequest
-	8,  // 6: api.Migration.TransferMemory:input_type -> api.MemoryChunk
-	9,  // 7: api.Migration.TransferFilesystem:input_type -> api.FileChunk
-	1,  // 8: api.Migration.Prepare:output_type -> api.PrepareResponse
-	3,  // 9: api.Migration.StartMigration:output_type -> api.StartMigrationResponse
-	5,  // 10: api.Migration.ApplyLayer:output_type -> api.ApplyLayerResponse
-	7,  // 11: api.Migration.SignalHandover:output_type -> api.SignalHandoverResponse
-	12, // 12: api.Migration.StartTap:output_type -> api.StartTapResponse
-	14, // 13: api.Migration.StopTap:output_type -> api.StopTapResponse
-	10, // 14: api.Migration.TransferMemory:output_type -> api.TransferResponse
-	10, // 15: api.Migration.TransferFilesystem:output_type -> api.TransferResponse
-	8,  // [8:16] is the sub-list for method output_type
-	0,  // [0:8] is the sub-list for method input_type
+	13, // 3: api.Migration.SignalHandover:input_type -> api.SignalHandoverRequest
+	9,  // 4: api.Migration.StartTap:input_type -> api.StartTapRequest
+	11, // 5: api.Migration.StopTap:input_type -> api.StopTapRequest
+	6,  // 6: api.Migration.TransferMemory:input_type -> api.MemoryChunk
+	7,  // 7: api.Migration.TransferFilesystem:input_type -> api.FileChunk
+	15, // 8: api.Migration.TransferFilesystemToNode:input_type -> api.TransferToNodeRequest
+	1,  // 9: api.Migration.Prepare:output_type -> api.PrepareResponse
+	3,  // 10: api.Migration.StartMigration:output_type -> api.StartMigrationResponse
+	5,  // 11: api.Migration.ApplyLayer:output_type -> api.ApplyLayerResponse
+	14, // 12: api.Migration.SignalHandover:output_type -> api.SignalHandoverResponse
+	10, // 13: api.Migration.StartTap:output_type -> api.StartTapResponse
+	12, // 14: api.Migration.StopTap:output_type -> api.StopTapResponse
+	8,  // 15: api.Migration.TransferMemory:output_type -> api.TransferResponse
+	8,  // 16: api.Migration.TransferFilesystem:output_type -> api.TransferResponse
+	16, // 17: api.Migration.TransferFilesystemToNode:output_type -> api.TransferToNodeResponse
+	9,  // [9:18] is the sub-list for method output_type
+	0,  // [0:9] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -1010,7 +1125,7 @@ func file_pkg_agent_api_migration_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_agent_api_migration_proto_rawDesc), len(file_pkg_agent_api_migration_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

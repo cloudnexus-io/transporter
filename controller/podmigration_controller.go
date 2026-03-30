@@ -108,6 +108,20 @@ func (r *PodMigrationReconciler) callStopTap(ctx context.Context, sourceNodeIP, 
 	return nil
 }
 
+func (r *PodMigrationReconciler) callTransferFilesystemToNode(ctx context.Context, sourceIP, targetIP string, podName string) error {
+	conn, _ := grpc.Dial(fmt.Sprintf("%s:%d", sourceIP, agentPort), grpc.WithInsecure())
+	defer conn.Close()
+	client := pb.NewMigrationClient(conn)
+	resp, err := client.TransferFilesystemToNode(ctx, &pb.TransferToNodeRequest{
+		PodName:       podName,
+		TargetAddress: fmt.Sprintf("%s:%d", targetIP, agentPort),
+	})
+	if err != nil || !resp.Success {
+		return fmt.Errorf("filesystem transfer failed: %v", resp.GetMessage())
+	}
+	return nil
+}
+
 func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	l := log.FromContext(ctx)
 	mig := &migrationv1alpha1.PodMigration{}
@@ -226,6 +240,11 @@ func (r *PodMigrationReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		l.Info("GHOST-SYNC: Capture Source -> Store")
 		if err := r.callAgentStart(ctx, sourceNodeIP, targetIP, mig.Spec.PodName, mig.Spec.Namespace, sourcePod.Status.ContainerStatuses[0].ContainerID); err != nil {
 			return ctrl.Result{}, err
+		}
+
+		l.Info("GHOST-SYNC: Transfer filesystem to target node")
+		if err := r.callTransferFilesystemToNode(ctx, sourceIP, targetIP, mig.Spec.PodName); err != nil {
+			l.Error(err, "Filesystem transfer failed", "source", sourceIP, "target", targetIP)
 		}
 
 		l.Info("GHOST-SYNC: Ghost Injection")
