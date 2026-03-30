@@ -8,6 +8,9 @@ service Migration {
   rpc Prepare(PrepareRequest) returns (PrepareResponse) {}
   rpc StartMigration(StartMigrationRequest) returns (StartMigrationResponse) {}
   rpc ApplyLayer(ApplyLayerRequest) returns (ApplyLayerResponse) {}
+  rpc SignalHandover(SignalHandoverRequest) returns (SignalHandoverResponse) {}
+  rpc StartTap(StartTapRequest) returns (StartTapResponse) {}
+  rpc StopTap(StopTapRequest) returns (StopTapResponse) {}
 
   rpc TransferMemory(stream MemoryChunk) returns (TransferResponse) {}
   rpc TransferFilesystem(stream FileChunk) returns (TransferResponse) {}
@@ -46,6 +49,16 @@ message ApplyLayerResponse {
   string message = 2;
 }
 
+message SignalHandoverRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+}
+
+message SignalHandoverResponse {
+  bool success = 1;
+  string message = 2;
+}
+
 message MemoryChunk {
   bytes data = 1;
   int64 offset = 2;
@@ -57,6 +70,32 @@ message FileChunk {
 }
 
 message TransferResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StartTapRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+  string source_pod_ip = 3;
+  string target_node_ip = 4;
+  int32 target_port = 5;
+  int32 app_port = 6;
+}
+
+message StartTapResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message StopTapRequest {
+  string pod_name = 1;
+  string pod_namespace = 2;
+  string source_pod_ip = 3;
+  int32 target_port = 4;
+}
+
+message StopTapResponse {
   bool success = 1;
   string message = 2;
 }

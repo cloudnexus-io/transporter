@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/containerd/containerd"
@@ -300,6 +303,100 @@ func (s *agentServer) ApplyLayer(ctx context.Context, in *pb.ApplyLayerRequest) 
 		}
 	}
 	return &pb.ApplyLayerResponse{Success: true, Message: "Applied"}, nil
+}
+
+func (s *agentServer) SignalHandover(ctx context.Context, in *pb.SignalHandoverRequest) (*pb.SignalHandoverResponse, error) {
+	fmt.Printf("SIGNAL HANDOVER: %s\n", in.PodName)
+
+	httpClient := &http.Client{Timeout: 5 * time.Second}
+
+	sidecarPodName := in.PodName + "-ghost"
+	resp, err := httpClient.Get(fmt.Sprintf("http://%s:50053/handover", sidecarPodName))
+	if err != nil {
+		fmt.Printf("Handover signal failed: %v\n", err)
+		return &pb.SignalHandoverResponse{Success: false, Message: err.Error()}, nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		fmt.Println("Handover successful")
+		return &pb.SignalHandoverResponse{Success: true, Message: "Handover completed"}, nil
+	}
+
+	return &pb.SignalHandoverResponse{Success: false, Message: "Handover failed"}, nil
+}
+
+func (s *agentServer) StartTap(ctx context.Context, in *pb.StartTapRequest) (*pb.StartTapResponse, error) {
+	fmt.Printf("START TAP: intercepting traffic for pod %s (IP: %s) -> target %s:%d\n",
+		in.PodName, in.SourcePodIp, in.TargetNodeIp, in.TargetPort)
+
+	cmd := exec.Command("iptables", "-t", "nat", "-A", "PREROUTING", "-p", "tcp", "-d", in.SourcePodIp,
+		"-j", "REDIRECT", "--to-port", strconv.Itoa(int(in.TargetPort)))
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Failed to add iptables PREROUTING rule: %v\n", err)
+		return &pb.StartTapResponse{Success: false, Message: err.Error()}, nil
+	}
+
+	cmd = exec.Command("iptables", "-t", "nat", "-A", "OUTPUT", "-p", "tcp", "-d", in.SourcePodIp,
+		"-j", "REDIRECT", "--to-port", strconv.Itoa(int(in.TargetPort)))
+	if err := cmd.Run(); err != nil {
+		fmt.Printf("Failed to add iptables OUTPUT rule: %v\n", err)
+		return &pb.StartTapResponse{Success: false, Message: err.Error()}, nil
+	}
+
+	s.currentPodName = in.PodName
+
+	go func() {
+		ln, err := net.Listen("tcp", fmt.Sprintf(":%d", in.TargetPort))
+		if err != nil {
+			fmt.Printf("Tap listener error: %v\n", err)
+			return
+		}
+		fmt.Printf("Tap listening on port %d, forwarding to %s:%d\n", in.TargetPort, in.TargetNodeIp, in.TargetPort)
+
+		for {
+			conn, err := ln.Accept()
+			if err != nil {
+				continue
+			}
+			go s.forwardConnection(conn, in.TargetNodeIp, in.TargetPort)
+		}
+	}()
+
+	return &pb.StartTapResponse{Success: true, Message: "Tap started"}, nil
+}
+
+func (s *agentServer) forwardConnection(clientConn net.Conn, targetIP string, targetPort int32) {
+	defer clientConn.Close()
+
+	targetAddr := fmt.Sprintf("%s:%d", targetIP, targetPort)
+	targetConn, err := net.DialTimeout("tcp", targetAddr, 5*time.Second)
+	if err != nil {
+		return
+	}
+	defer targetConn.Close()
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() { io.Copy(targetConn, clientConn); targetConn.Close() }()
+	go func() { io.Copy(clientConn, targetConn); clientConn.Close() }()
+
+	wg.Wait()
+}
+
+func (s *agentServer) StopTap(ctx context.Context, in *pb.StopTapRequest) (*pb.StopTapResponse, error) {
+	fmt.Printf("STOP TAP: removing iptables rules for %s\n", in.PodName)
+
+	cmd := exec.Command("iptables", "-t", "nat", "-D", "PREROUTING", "-p", "tcp", "-d", in.SourcePodIp,
+		"-j", "REDIRECT", "--to-port", strconv.Itoa(int(in.TargetPort)))
+	cmd.Run()
+
+	cmd = exec.Command("iptables", "-t", "nat", "-D", "OUTPUT", "-p", "tcp", "-d", in.SourcePodIp,
+		"-j", "REDIRECT", "--to-port", strconv.Itoa(int(in.TargetPort)))
+	cmd.Run()
+
+	return &pb.StopTapResponse{Success: true, Message: "Tap stopped"}, nil
 }
 
 func main() {

@@ -9,6 +9,9 @@ controller:
     repository: 192.168.1.20:5000/controller
     tag: latest
     pullPolicy: Always
+
+  env:
+    # TRANSPORTER_SIDECAR_IMAGE: "my-registry.com/transporter-proxy:latest"
     
   resources:
     limits:
@@ -25,6 +28,12 @@ migrationAgent:
     repository: 192.168.1.20:5000/migration-agent
     tag: latest
     pullPolicy: Always
+
+# Sidecar configuration
+sidecar:
+  # Configure the sidecar image used during migration
+  # If not set, defaults to "transporter-proxy:latest"
+  image: "192.168.1.20:5000/transporter-proxy:latest"
     
 # Service account configuration
 serviceAccount:
