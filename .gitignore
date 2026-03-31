@@ -1,0 +1,20 @@
+# Vim swap files
+*.swp
+*.swo
+*.swn
+*.sw?
+
+# Vim undo and backup files
+*~
+*.un~
+.netrwhist
+
+# Crash log files
+crash.log
+
+# DS_Store
+.DS_Store
+
+# Megalinter
+megalinter-reports/
+mega-linter.log
