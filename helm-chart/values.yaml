@@ -12,7 +12,10 @@ controller:
 
   env:
     # TRANSPORTER_SIDECAR_IMAGE: "my-registry.com/transporter-proxy:latest"
-    
+
+  ports:
+    - containerPort: 8081
+      name: healthz
   resources:
     limits:
       cpu: 200m
@@ -21,6 +24,20 @@ controller:
       cpu: 100m
       memory: 128Mi
 
+  livenessProbe:
+    httpGet:
+      path: /healthz
+      port: healthz
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  readinessProbe:
+    httpGet:
+      path: /readyz
+      port: healthz
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
 # Migration agent configuration  
 migrationAgent:
   enabled: true
@@ -28,6 +45,19 @@ migrationAgent:
     repository: 192.168.1.20:5000/migration-agent
     tag: latest
     pullPolicy: Always
+
+  env:
+    - name: AGENT_PORT
+      value: "50051"
+    - name: NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+
+  ports:
+    - name: grpc
+      containerPort: 50051
+      hostPort: 50051
 
 # Sidecar configuration
 sidecar:

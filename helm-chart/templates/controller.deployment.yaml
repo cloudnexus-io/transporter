@@ -40,20 +40,17 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           ports:
-            - containerPort: 8081
-              name: healthz
+            {{- with .Values.controller.ports }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: healthz
-            initialDelaySeconds: 15
-            periodSeconds: 20
+            {{- with .Values.controller.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           readinessProbe:
-            httpGet:
-              path: /readyz
-              port: healthz
-            initialDelaySeconds: 5
-            periodSeconds: 10
+            {{- with .Values.controller.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.controller.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
